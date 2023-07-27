@@ -1,19 +1,19 @@
-(This document is a preview of the underlying format consumed by
-ChatGPT models. As a developer, you can use our [higher-level
-API](https://platform.openai.com/docs/guides/chat) and won't need to
-interact directly with this format today — but expect to have the
-option in the future!)
+(Ce document est un aperçu du format sous-jacent utilisé par
+Modèles ChatGPT. En tant que développeur, vous pouvez utiliser notre [niveau supérieur
+API](https://platform.openai.com/docs/guides/chat) et n'aura pas besoin de
+interagir directement avec ce format aujourd'hui, mais attendez-vous à avoir le
+option à l'avenir !)
 
-Traditionally, GPT models consumed unstructured text. ChatGPT models
-instead expect a structured format, called Chat Markup Language
-(ChatML for short).
-ChatML documents consist of a sequence of messages. Each message
-contains a header (which today consists of who said it, but in the
-future will contain other metadata) and contents (which today is a
-text payload, but in the future will contain other datatypes).
-We are still evolving ChatML, but the current version (ChatML v0) can
-be represented with our upcoming "list of dicts" JSON format as
-follows:
+Traditionnellement, les modèles GPT consommaient du texte non structuré. Modèles ChatGPT
+attendez-vous plutôt à un format structuré, appelé Chat Markup Language
+(ChatML en abrégé).
+Les documents ChatML consistent en une séquence de messages. Chaque message
+contient un en-tête (qui consiste aujourd'hui en celui qui l'a dit, mais dans le
+contiendra d'autres métadonnées) et des contenus (qui aujourd'hui sont
+charge utile de texte, mais contiendra à l'avenir d'autres types de données).
+Nous continuons à faire évoluer ChatML, mais la version actuelle (ChatML v0) peut
+être représenté avec notre prochain format JSON "liste de dicts" comme
+suit :
 ```
 [
  {"token": "<|im_start|>"},
@@ -27,9 +27,9 @@ follows:
  {"token": "<|im_end|>"}, "\n"
 ]
 ```
-You could also represent it in the classic "unsafe raw string"
-format. However, this format inherently allows injections from user
-input containing special-token syntax, similar to SQL injections:
+Vous pouvez également le représenter dans la classique "chaîne brute non sécurisée"
+format. Cependant, ce format permet intrinsèquement des injections de l'utilisateur
+entrée contenant une syntaxe de jeton spécial, similaire aux injections SQL :
 ```
 <|im_start|>system
 You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.
@@ -42,11 +42,11 @@ I am doing well!<|im_end|>
 <|im_start|>user
 How are you now?<|im_end|>
 ```
-## Non-chat use-cases
-ChatML can be applied to classic GPT use-cases that are not
-traditionally thought of as chat. For example, instruction following
-(where a user requests for the AI to complete an instruction) can be
-implemented as a ChatML query like the following:
+## Cas d'utilisation hors chat
+ChatML peut être appliqué aux cas d'utilisation GPT classiques qui ne sont pas
+traditionnellement considéré comme un chat. Par exemple, l'instruction suivant
+(lorsqu'un utilisateur demande à l'IA de terminer une instruction) peut être
+implémenté en tant que requête ChatML comme suit :
 ```
 [
  {"token": "<|im_start|>"},
@@ -55,8 +55,7 @@ implemented as a ChatML query like the following:
  "assistant"
 ]
 ```
-We do not currently allow autocompleting of partial messages, 
-```
+Nous n'autorisons pas actuellement la saisie semi-automatique de messages partiels,```
 [
  {"token": "<|im_start|>"},
  "system\nPlease autocomplete the user's message.",
@@ -64,15 +63,15 @@ We do not currently allow autocompleting of partial messages,
  "user\nThis morning I decided to eat a giant"
 ]
 ```
-Note that ChatML makes explicit to the model the source of each piece
-of text, and particularly shows the boundary between human and AI
-text. This gives an opportunity to mitigate and eventually solve
-injections, as the model can tell which instructions come from the
-developer, the user, or its own input.
-## Few-shot prompting
-In general, we recommend adding few-shot examples using separate
-`system` messages with a `name` field of `example_user` or
-`example_assistant`. For example, here is a 1-shot prompt:
+Notez que ChatML rend explicite au modèle la source de chaque pièce
+du texte, et montre en particulier la frontière entre l'humain et l'IA
+texte. Cela donne l'occasion d'atténuer et éventuellement de résoudre
+injections, car le modèle peut dire quelles instructions proviennent du
+développeur, l'utilisateur ou sa propre contribution.
+## Invite à quelques prises de vue
+En général, nous vous recommandons d'ajouter des exemples de quelques plans en utilisant des
+messages `system` avec un champ `name` de `example_user` ou
+`exemple_assistant`. Par exemple, voici une invite à un coup :
 ```
 <|im_start|>system
 Translate from English to French
@@ -86,8 +85,8 @@ Comment allez-vous?
 <|im_start|>user
 {{user input here}}<|im_end|>
 ```
-If adding instructions in the `system` message doesn't work, you can
-also try putting them into a `user` message. (In the near future, we
-will train our models to be much more steerable via the system
-message. But to date, we have trained only on a few system messages,
-so the models pay much more attention to user examples.)
+Si l'ajout d'instructions dans le message `system` ne fonctionne pas, vous pouvez
+essayez également de les mettre dans un message "utilisateur". (Dans un futur proche, nous
+entraînera nos modèles à être beaucoup plus orientables via le système
+message. Mais à ce jour, nous ne nous sommes entraînés que sur quelques messages système,
+les modèles accordent donc beaucoup plus d'attention aux exemples d'utilisateurs.)
